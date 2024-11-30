@@ -10,21 +10,25 @@
 
 <script type="text/javascript" src="database.js"></script>
 <script type="text/javascript">
+    var lat_now = 0;
+    var lng_now = 0;
     function search() {
         navigator.geolocation.getCurrentPosition((position)=> {
             //緯度
             const lat = position.coords.latitude;
             //経度
             const lng = position.coords.longitude;
-            Init(lat, lng);
+            lat_now = Number(lat);
+            lng_now = Number(lng);
+            Init();
         });
     }
 
     var oMap      = null;
 
-    function Init(lat_now, lng_now) {
+    function Init() {
         var vURL      = "https://maps.gsi.go.jp";
-        var vURL_Site = "/index_pm.html?postmessage=1#16/" + lat_now + "/" + lng_now + "/&base=pale&ls=pale%7Crelief_free&blend=1&disp=11&vs=c1g1j0h0k0l0u0t0z0r0s0m0f1&reliefdata=01G0000FFG2G0095FFG3G00EEFFG4G49F780G5G91FF00G6GC8FF00G7GE4A200GGFF4400";
+        var vURL_Site = "/index_pm.html?postmessage=1#16/" + lat_now + "/" + lng_now + "/&base=pale&ls=pale%7Crelief_free%2C0.25&blend=1&disp=11&vs=c0g1j0h0k0l0u0t0z0r0s0m0f1&reliefdata=01G0000FFG2G0095FFG3G00EEFFG4G91FF00G5GFFFF00G6GFF8C00G7GFF6800GGFF4400";
         oMap = document.createElement("iframe");
         oMap.style.display = "none";
 
@@ -39,15 +43,30 @@
                 , sakuzuList  : null
                 , queryString : null
             };
+            var double = [];
+            for (var i = 0; i < shelter_name.length; i++) {
+                for (var j = 0; j < shelter_site_name.length; j++) {
+                    if (shelter_name[i] == shelter_site_name[j]) {
+                        double.push(shelter_name[i]);
+                    }
+                }
+            }
             var template = [];
             for (var i = 0; i < shelter_name.length + 1; i++) {
                 if (i == shelter_name.length) {
-                    template.push({"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":'現在地',"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/082.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[lng_now,lat_now]}}]});
+                    template.push({"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":'現在地',"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/082.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[lng_now,lat_now]}}]}, {"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"_markerType":"DivIcon","_html":"<div style=\"font-size:9.5pt;color:#000000;background-color:#ffffff;\">現在地</div>"},"geometry":{"type":"Point","coordinates":[lng_now + 0.00025,lat_now]}}]});
                 } else {
-                    if (shelter_site_name[i].indexOf('グラウンド') != -1) {
-                        template.push({"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":shelter_name[i],"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/080.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[shelter_lng[i],shelter_lat[i]]}}]});
+                    var double_judg = false;
+                    for (var j = 0; j < double.length; j++) {
+                        if (double[j] == shelter_site_name[i]) {
+                            double_judg = true;
+                            break;
+                        }
+                    }
+                    if (double_judg == true) {
+                        template.push({"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":shelter_name[i],"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/080.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[shelter_lng[i],shelter_lat[i]]}}]}, {"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"_markerType":"DivIcon","_html":"<div style=\"font-size:9.5pt;color:#000000;background-color:#ffffff;\">" + shelter_name[i] + "</div>"},"geometry":{"type":"Point","coordinates":[shelter_lng[i] + 0.00025,shelter_lat[i]]}}]});
                     } else {
-                        template.push({"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":shelter_name[i],"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/080.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[shelter_lng[i],shelter_lat[i]]}}]}, {"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":shelter_site_name[i],"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/809.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[shelter_site_lng[i],shelter_site_lat[i]]}}]});
+                        template.push({"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":shelter_name[i],"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/080.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[shelter_lng[i],shelter_lat[i]]}}]}, {"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"_markerType":"DivIcon","_html":"<div style=\"font-size:9.5pt;color:#000000;background-color:#ffffff;\">" + shelter_name[i] + "</div>"},"geometry":{"type":"Point","coordinates":[shelter_lng[i] + 0.00025,shelter_lat[i]]}}]}, {"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":shelter_site_name[i],"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/809.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[shelter_site_lng[i],shelter_site_lat[i]]}}]}, {"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"_markerType":"DivIcon","_html":"<div style=\"font-size:9.5pt;color:#000000;background-color:#ffffff;\">" + shelter_site_name[i] + "</div>"},"geometry":{"type":"Point","coordinates":[shelter_site_lng[i] + 0.00025,shelter_site_lat[i]]}}]});
                     }
                 }
             }
@@ -71,10 +90,30 @@
         }
     };
 
+    function showWindow(divId) {
+        document.getElementById(divId).style.visibility = "visible";
+    }
+
+    function closeWindow(divId) {
+        document.getElementById(divId).style.visibility = "hidden";
+    }
+
+    
+
     window.onload   = function(){
         document.body.style.margin   = "0px";
         document.body.style.padding  = "0px";
         document.body.style.overflow = "hidden";
+        document.getElementById("open_button").addEventListener("click", () => {
+            closeWindow("closeDiv");
+            showWindow("openDiv");
+        });
+
+        document.getElementById("close_button").addEventListener("click", () => {
+            closeWindow("openDiv");
+            showWindow("closeDiv");
+        });
+        showWindow("closeDiv");
         search();
     }
     window.onresize = EvtResize;
@@ -118,6 +157,86 @@ p {
     text-align: center;
     position: absolute;
 }
+.blue {
+    background-color: rgba(9, 11, 255, 0.75);
+    width: 15px;
+    height: 12px;
+    line-height: 150%;
+    margin: 3% 5%;
+    display: block;
+    text-align: center;
+    position: absolute;
+}
+.sky {
+    background-color: rgba(9, 152, 255, 0.75);
+    width: 15px;
+    height: 12px;
+    line-height: 150%;
+    margin: 3% 5%;
+    display: block;
+    text-align: center;
+    position: absolute;
+}
+.water {
+    background-color: rgba(9, 236, 255, 0.75);
+    width: 15px;
+    height: 12px;
+    line-height: 150%;
+    margin: 3% 5%;
+    display: block;
+    text-align: center;
+    position: absolute;
+}
+.lime_green {
+    background-color: rgba(147, 252, 12, 0.75);
+    width: 15px;
+    height: 12px;
+    line-height: 150%;
+    margin: 3% 5%;
+    display: block;
+    text-align: center;
+    position: absolute;
+}
+.yellow {
+    background-color: rgba(251, 252, 12, 0.75);
+    width: 15px;
+    height: 12px;
+    line-height: 150%;
+    margin: 3% 5%;
+    display: block;
+    text-align: center;
+    position: absolute;
+}
+.orange {
+    background-color: rgba(251, 143, 12, 0.75);
+    width: 15px;
+    height: 12px;
+    line-height: 150%;
+    margin: 3% 5%;
+    display: block;
+    text-align: center;
+    position: absolute;
+}
+.akadaidai {
+    background-color: rgba(251, 109, 12, 0.75);
+    width: 15px;
+    height: 12px;
+    line-height: 150%;
+    margin: 3% 5%;
+    display: block;
+    text-align: center;
+    position: absolute;
+}
+.benihi {
+    background-color: rgba(251, 75, 12, 0.75);
+    width: 15px;
+    height: 12px;
+    line-height: 150%;
+    margin: 3% 5%;
+    display: block;
+    text-align: center;
+    position: absolute;
+}
 #topDiv {
     visibility: visible;
     background-color:rgb(255, 255, 255);
@@ -125,17 +244,72 @@ p {
     border-color: rgb(130, 130, 130);
     border-style: solid;
     position: absolute;
-    width: 210px;
+    width: 100px;
     height: 85px;
     line-height: 150%;
     top: 80%;
-    right: 20%;
+    right: 10%;
+}
+#openDiv {
+    visibility: hidden;
+    background-color:rgb(255, 255, 255);
+    border: 1px;
+    border-color: rgb(130, 130, 130);
+    border-style: solid;
+    position: absolute;
+    text-align: left;
+    width: 140px;
+    height: 200px;
+    line-height: 150%;
+    top: 50%;
+    right: 10%;
+}
+#closeDiv {
+    visibility: hidden;
+    background-color:rgb(255, 255, 255);
+    border: 1px;
+    border-color: rgb(130, 130, 130);
+    border-style: solid;
+    position: absolute;
+    width: 100px;
+    height: 30px;
+    top: 75%;
+    right: 10%;
+}
+#close_button {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    line-height: 18px;
+    background-color:cadetblue;
+    text-align: center;
+    position: absolute;
+    right: 3px;
+    top: 2px;
+}
+#open_button {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    line-height: 18px;
+    background-color:cadetblue;
+    text-align: center;
+    position: absolute;
+    right: 3px;
+    top: 5px;
 }
 </style>
 </head>
 <body>
+    <div id="closeDiv">
+        <p>　色の説明</p><div id="open_button">+</div>
+    </div>
+    <div id="openDiv">
+        <div id="close_button">-</div>
+        <p><div class="blue"></div>　　1m以下<br><div class="sky"></div>　　1m~2m以下<br><div class="water"></div>　　2m~3m以下<br><div class="lime_green"></div>　　3m~4m以下<br><div class="yellow"></div>　　4m~5m以下<br><div class="orange"></div>　　5m~6m以下<br><div class="akadaidai"></div>　　6m~7m以下<br><div class="benihi"></div>　　7m以上</p>
+    </div>
     <div id="topDiv" style="text-align: left;">
-        <p><div class="green"></div>　　現在地<br><div class="red"></div>　　最寄りの避難場所<br><div class="pink"></div>　　その他の避難場所</p>
+        <p><div class="green"></div>　　現在地<br><div class="red"></div>　　避難所<br><div class="pink"></div>　　避難場所</p>
     </div>
 </body>
 </html>

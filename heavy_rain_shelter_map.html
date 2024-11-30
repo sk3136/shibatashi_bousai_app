@@ -10,19 +10,23 @@
 
 <script type="text/javascript" src="database.js"></script>
 <script type="text/javascript">
+    var lat_now = 0;
+    var lng_now = 0;
     function search() {
         navigator.geolocation.getCurrentPosition((position)=> {
             //緯度
             const lat = position.coords.latitude;
             //経度
             const lng = position.coords.longitude;
-            Init(lat, lng);
+            lat_now = Number(lat);
+            lng_now = Number(lng);
+            Init();
         });
     }
 
     var oMap      = null;
 
-    function Init(lat_now, lng_now) {
+    function Init() {
         var vURL      = "https://maps.gsi.go.jp";
         var vURL_Site = "/index_pm.html?postmessage=1#16/" + lat_now + "/" + lng_now + "/&base=pale&ls=pale&disp=1&vs=c0g1j0h0k0l0u0t0z0r0s0m0f1";
         oMap = document.createElement("iframe");
@@ -39,19 +43,40 @@
                 , sakuzuList  : null
                 , queryString : null
             };
+            var double = [];
+            for (var i = 0; i < shelter_name.length; i++) {
+                for (var j = 0; j < shelter_site_name.length; j++) {
+                    if (shelter_name[i] == shelter_site_name[j]) {
+                        double.push(shelter_name[i]);
+                    }
+                }
+            }
             var template = [];
             for (var i = 0; i < shelter_name.length + 1; i++) {
                 if (i == shelter_name.length) {
-                    template.push({"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":'現在地',"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/082.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[lng_now,lat_now]}}]});
+                    template.push({"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":'現在地',"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/082.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[lng_now,lat_now]}}]}, {"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"_markerType":"DivIcon","_html":"<div style=\"font-size:9.5pt;color:#000000;background-color:#ffffff;\">現在地</div>"},"geometry":{"type":"Point","coordinates":[lng_now + 0.00025,lat_now]}}]});
                 } else {
-                    if (shelter_site_name[i].indexOf('グラウンド') != -1) {
-                        if (shelter_rain[i] == '◯' && shelter_site_rain[i] == '◯') {
-                            template.push({"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":shelter_name[i],"水害時使用":'◯',"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/080.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[shelter_lng[i],shelter_lat[i]]}}]});
-                        } else {
-                            template.push({"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":shelter_name[i],"水害時使用":'△',"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/080.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[shelter_lng[i],shelter_lat[i]]}}]});
+                    var double_judg = false;
+                    for (var j = 0; j < double.length; j++) {
+                        if (double[j] == shelter_site_name[i]) {
+                            double_judg = true;
+                            break;
+                        }
+                    }
+                    if (double_judg == true) {
+                        for (var j = 0; j < shelter_site_name.length; j++) {
+                            if (shelter_name[i] == shelter_site_name[j]) {
+                                if (shelter_rain[i] == '◯' && shelter_site_rain[j] == '◯') {
+                                    template.push({"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":shelter_name[i],"水害時使用":'◯',"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/080.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[shelter_lng[i],shelter_lat[i]]}}]}, {"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"_markerType":"DivIcon","_html":"<div style=\"font-size:9.5pt;color:#000000;background-color:#ffffff;\">" + shelter_name[i] + "</div>"},"geometry":{"type":"Point","coordinates":[shelter_lng[i] + 0.00025,shelter_lat[i]]}}]});
+                                    break;
+                                } else {
+                                    template.push({"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":shelter_name[i],"水害時使用":'△',"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/080.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[shelter_lng[i],shelter_lat[i]]}}]}, {"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"_markerType":"DivIcon","_html":"<div style=\"font-size:9.5pt;color:#000000;background-color:#ffffff;\">" + shelter_name[i] + "</div>"},"geometry":{"type":"Point","coordinates":[shelter_lng[i] + 0.00025,shelter_lat[i]]}}]});
+                                    break;
+                                }
+                            }
                         }
                     } else {
-                        template.push({"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":shelter_name[i],"水害時使用":shelter_rain[i],"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/080.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[shelter_lng[i],shelter_lat[i]]}}]}, {"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":shelter_site_name[i],"水害時使用":shelter_site_rain[i],"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/809.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[shelter_site_lng[i],shelter_site_lat[i]]}}]});
+                        template.push({"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":shelter_name[i],"水害時使用":shelter_rain[i],"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/080.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[shelter_lng[i],shelter_lat[i]]}}]}, {"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"_markerType":"DivIcon","_html":"<div style=\"font-size:9.5pt;color:#000000;background-color:#ffffff;\">" + shelter_name[i] + "</div>"},"geometry":{"type":"Point","coordinates":[shelter_lng[i] + 0.00025,shelter_lat[i]]}}]}, {"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"name":shelter_site_name[i],"水害時使用":shelter_site_rain[i],"_markerType":"Icon","_iconUrl":"https://maps.gsi.go.jp/portal/sys/v4/symbols/809.png","_iconSize":[20,20],"_iconAnchor":[10,10]},"geometry":{"type":"Point","coordinates":[shelter_site_lng[i],shelter_site_lat[i]]}}]}, {"fileName":"","visible":true,"features":[{"type":"Feature","properties":{"_markerType":"DivIcon","_html":"<div style=\"font-size:9.5pt;color:#000000;background-color:#ffffff;\">" + shelter_site_name[i] + "</div>"},"geometry":{"type":"Point","coordinates":[shelter_site_lng[i] + 0.00025,shelter_site_lat[i]]}}]});
                     }
                 }
             }
@@ -128,11 +153,11 @@ p {
     border-color: rgb(130, 130, 130);
     border-style: solid;
     position: absolute;
-    width: 210px;
+    width: 100px;
     height: 85px;
     line-height: 150%;
     top: 80%;
-    right: 20%;
+    right: 10%;
 }
 </style>
 </head>
