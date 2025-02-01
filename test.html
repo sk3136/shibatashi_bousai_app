@@ -94,11 +94,15 @@
             if (answer_total - count[0].length == 0) {
                 document.getElementById('comment').innerHTML = 'あなたの防災対策は<br>十分に整っています<br>水や食料品の消味期限にも<br>気を付けておきましょう';
                 setinterval = setInterval(canvas_animation, 1, answer_total, count[0].length, grade[0]);
-            } else if (answer_total - count[0].length <= 1) {
-                document.getElementById('comment').innerHTML = 'あなたの防災対策はとても良いですが' + necessary_goods + '<br>も用意しておけば完璧です<br>水や食料品の消味期限にも<br>気を付けておきましょう';
+            } else if (answer_total - count[0].length <= 3) {
+                if (answer_total - count[0].length == 1) {
+                    document.getElementById('comment').innerHTML = 'あなたの防災対策はとても整っていますが' + necessary_goods + '<br>も用意しておけば完璧です<br>水や食料品の消味期限にも<br>気を付けておきましょう';
+                } else {
+                    document.getElementById('comment').innerHTML = 'あなたの防災対策はとても整っていますが' + necessary_goods + '<br>などの用意しておけば完璧です<br>水や食料品の消味期限にも<br>気を付けておきましょう';
+                }
                 setinterval = setInterval(canvas_animation, 1, answer_total, count[0].length, grade[1]);
-            } else if (answer_total - count[0].length <= 5) {
-                document.getElementById('comment').innerHTML = 'あなたの防災対策は概ね良いですが' + necessary_goods + '<br>などの防災グッズも<br>用意しておく必要があります';
+            } else if (answer_total - count[0].length <= 8) {
+                document.getElementById('comment').innerHTML = 'あなたの防災対策は概ね整っていますが' + necessary_goods + '<br>などの防災グッズも<br>用意しておく必要があります';
                 setinterval = setInterval(canvas_animation, 1, answer_total, count[0].length, grade[2]);
             } else if (answer_total - count[0].length <= Math.floor((answer_total) / 2)) {
                 document.getElementById('comment').innerHTML = 'あなたは防災対策を<br>もう少し頑張りましょう' + necessary_goods + '<br>などの防災グッズを<br>用意しておく必要があります';
