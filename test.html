@@ -45,7 +45,7 @@
         }
         pen.stroke();
 
-        frame++;
+        frame = frame + 2;
     }
 
     var memoly = [];
@@ -92,13 +92,13 @@
             var answer_total = Number(Disaster_prevention_goods.length) - count[1].length;
             document.getElementById('total_answer').innerHTML = 'あなたは' + answer_total + '品目中' + count[0].length + '品目の<br>防災グッズを取り出し可能でした';
             if (answer_total - count[0].length == 0) {
-                document.getElementById('comment').innerHTML = 'あなたの防災対策は<br>十分に整っています<br>水や食料品の消味期限にも<br>気を付けておきましょう';
+                document.getElementById('comment').innerHTML = 'あなたの防災対策は<br>十分に整っています<br>水や食料品の賞味期限にも<br>気を付けておきましょう';
                 setinterval = setInterval(canvas_animation, 1, answer_total, count[0].length, grade[0]);
             } else if (answer_total - count[0].length <= 3) {
                 if (answer_total - count[0].length == 1) {
-                    document.getElementById('comment').innerHTML = 'あなたの防災対策は<br>とても整っていますが' + necessary_goods + '<br>も用意しておけば完璧です<br>水や食料品の消味期限にも<br>気を付けておきましょう';
+                    document.getElementById('comment').innerHTML = 'あなたの防災対策は<br>とても整っていますが' + necessary_goods + '<br>も用意しておけば完璧です<br>水や食料品の賞味期限にも<br>気を付けておきましょう';
                 } else {
-                    document.getElementById('comment').innerHTML = 'あなたの防災対策は<br>とても整っていますが' + necessary_goods + '<br>などの防災グッズも<br>用意しておけば完璧です<br>水や食料品の消味期限にも<br>気を付けておきましょう';
+                    document.getElementById('comment').innerHTML = 'あなたの防災対策は<br>とても整っていますが' + necessary_goods + '<br>などの防災グッズも<br>用意しておけば完璧です<br>水や食料品の賞味期限にも<br>気を付けておきましょう';
                 }
                 setinterval = setInterval(canvas_animation, 1, answer_total, count[0].length, grade[1]);
             } else if (answer_total - count[0].length <= 8) {
@@ -199,6 +199,7 @@
         <p><a id="total_answer"></a></p>
         <canvas id="canvas" width="250px" height="160px"></canvas>
         <p><a id="comment"></a></p>
+        <p class="url">このチェックテストは、<br><a href="https://www.city.shibata.lg.jp/kurashi/iza/sonae/1008873/index.html">新発田市ハザードマップの<br>非常持ち出し品チェックシート</a><br>を基に作成しました。</p>
     </div>
     <button class="home_button" onclick="location.href='index.html'">ホームに戻る</button>
 </body>
